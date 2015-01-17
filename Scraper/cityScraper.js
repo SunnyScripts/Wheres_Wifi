@@ -1,12 +1,16 @@
 /**
- * Created by ryan berg on 12/15/14.
+ * Created by Ryan Berg on 12/15/14.
  * rberg2@hotmail.com
  */
 
-var numberOfPages = 25;
 
 
-for(var i = 0; i < numberOfPages; i++)
+const maxNumberOfPages = 25;
+var numberOfResponses = 0;
+
+var cityObjectArray = [];
+
+for(var i = 0; i < maxNumberOfPages; i++)
 {
     var pageNumber = i + 1;
     var pageNumberString = '';
@@ -18,10 +22,10 @@ for(var i = 0; i < numberOfPages; i++)
 
     var requestString = 'http://www.topix.com/city/list/' + pageNumberString;
 
-    requestFunction(requestString, pageNumber);
+    sendRequestWithURLString(requestString);
 }
 
-function requestFunction(requestString, pageNumber)
+function sendRequestWithURLString(requestString)
 {
     var request = require('request');
 
@@ -29,41 +33,43 @@ function requestFunction(requestString, pageNumber)
     {
         if (!error && response.statusCode == 200)
         {
+            numberOfResponses++;
 
-            var cityObjectArray = [];
-
+            //html page contains 4 columns of cities
             var columnArray = htmlData.match(/_col"[^_]*/g);
 
-            //TODO: add comments for clarity
             for (var i = 0; i < columnArray.length; i++)
             {
+                //find every city in the column
                 var cityInfoArray = columnArray[i].match(/[A-Z][^,]*, [A-Z]{2}/g);
 
-
+                //are there any cities in the array, potential for 5th empty column
                 if (cityInfoArray)
                 {
                     for (var j = 0; j < cityInfoArray.length; j++)
                     {
-                        //TODO: change array name
-                        var array = cityInfoArray[j].match(/\(/);
+                        //'Addison (Webster Springs), WV' is NOT wanted
+                        //considered a duplicate entry
+                        var citySubdomainArray = cityInfoArray[j].match(/\(/);
 
-                        if (!array)
+                        //if not a duplicate entry
+                        if (!citySubdomainArray)
                         {
+                            //separate the city from the state data
                             var stateArray = cityInfoArray[j].match(/[A-Z]{2}/);
                             var cityString = cityInfoArray[j].replace(/, [A-Z]{2}/, '');
 
-                            var cityObject = {city: cityString, state: stateArray[0]};
+                            var cityObject = {'city': cityString, 'state': stateArray[0]};
+
                             cityObjectArray.push(cityObject);
                         }
                     }
                 }
-
-
             }
-
-//            console.log(cityObjectArray);
-            writeDataToFile(JSON.stringify(cityObjectArray), 'us-cities-pg'+String(pageNumber)+'.json');
-
+            if(numberOfResponses == maxNumberOfPages)
+            {
+                writeDataToFile(JSON.stringify(cityObjectArray), 'cityList.json');
+            }
         }
     });
 }
@@ -74,9 +80,6 @@ function writeDataToFile(data, fileName)
 
     fs.writeFile(fileName, data, function(error)
     {
-        if(error)
-        {
-            throw error;
-        }
+        if(error) { throw error; }
     });
 }

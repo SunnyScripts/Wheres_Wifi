@@ -1,24 +1,22 @@
 Where's Wifi API
 =============
 
-
-The database uses mongodb and follows these guidelines:
-
-
 Database name:'Wheres_Wifi'
 
-Collections: 'businesses'
+Collections: 'businesses', 'cities', 'userAgents'
 
 URI Format:
 *under construction*
 
 JSON Format:
 
+'businesses':
 {
 
     _id: String(),
     name: String(),
-    category: String(),
+    phoneNumber: String(),
+    category: Array(),
     address:
     {
         fullAddress: String(),

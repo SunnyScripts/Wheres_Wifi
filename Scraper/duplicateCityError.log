@@ -1,0 +1,35 @@
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Coaldale,PA" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Centerville,OH" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Bay St. Louis,MS" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Butler,OH" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Centerville,PA" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "East St. Louis,IL" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "De Funiak Springs,FL" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Defuniak Springs,FL" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Franklin,PA" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Glen St. Mary,FL" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Milford,IN" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Lakeside,TX" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Kailua,HI" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Newburg,PA" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Oak Ridge,TX" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Fulton,AR" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Port St. Joe,FL" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Pleasantville,PA" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Sequim,WA" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Lewis,IA" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Port St. Lucie,FL" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Lake St. Louis,MO" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Marine on St. Croix,MN" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Sisseton,SD" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Whitehall,PA" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Windsor,IL" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Oakwood,OH" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Oak Grove,MO" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Oakwood,OH" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Rome,OH" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Wilmington,IL" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Sault Ste. Marie,MI" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "The Dalles,OR" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "Reno,TX" }
+MongoError: insertDocument :: caused by :: 11000 E11000 duplicate key error index: Wheres_Wifi.cities.$_id_  dup key: { : "St. Anthony,MN" }
