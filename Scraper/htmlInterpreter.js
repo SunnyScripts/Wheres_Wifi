@@ -11,7 +11,33 @@
 var http = require('http');
 var mongojs = require('mongojs');
 
-var db = mongojs('###.###.###.###/Wheres_Wifi', ['businesses', 'cities']);
+
+var databaseIP = '10.240.212.83';//internal ip
+var listeningPort = 9000;
+
+if(process.argv[2])
+{
+    if(process.argv[2] === 'external')
+    {
+        databaseIP = '130.211.163.79';
+    }
+    else if(process.argv[2].length > 4)
+    {
+        databaseIP = process.argv[2];
+    }
+    else if(process.argv[2].length == 4)
+    {
+        listeningPort = Number(process.argv[2]);
+    }
+}
+
+if(process.argv[3])
+{
+    listeningPort = Number(process.argv[3]);
+}
+
+
+var db = mongojs(databaseIP + '/Wheres_Wifi', ['businesses', 'cities']);
 
 
 http.createServer(function(request, response)
@@ -33,8 +59,9 @@ http.createServer(function(request, response)
         parseHtml(body);
     });
 
-}).listen(8888);
-console.log('interpreter listening on port 8888');
+}).listen(listeningPort);
+console.log('interpreter listening on port: ' + listeningPort);
+console.log('sending inserts to the database on IP: ' + databaseIP);
 
 
 function parseHtml(body)
@@ -44,10 +71,9 @@ function parseHtml(body)
     var cityObject = json.cityObject;
     var htmlData = json.htmlData;
 
-    //console.log(putBusinessAttributesIntoJSONFormatFrom(htmlData, cityObject.city, cityObject.state));
-
     //find available pages in htmlData
     var pageCountMatchArray = htmlData.match(/Page 1 of \d*/g);
+    console.log(pageCountMatchArray);
 
     if(pageCountMatchArray)//page has results
     {
@@ -72,6 +98,7 @@ function updateCityObject(cityObjectID, pagesAvailable, currentPageRequest)
     {
         db.cities.update({'_id': cityObjectID}, {$set: {'isLogCompleted': true, 'dateLogCompleted': new Date(), 'lastPageRequest': currentPageRequest}}, function(error)
         {
+            //TODO: failed to connect to database
             if(error) { throw error; }
         });
     }
@@ -106,7 +133,8 @@ function putBusinessAttributesIntoJSONFormatFrom(htmlData, city, state)
 
     // category \\
     bloatedArray = htmlData.match(/class="category-str-list">[\s\S]*?<\/span>/g);
-    var categoryArray = findAndReplaceWith(/[a-zA-Z &]*<\/a/g, bloatedArray, '</a', null, true);
+    var categoryArray = findAndReplaceWith(/[a-zA-Z &amp;()]*<\/a/g, bloatedArray, '</a', null, true);
+
 
     // address \\
     bloatedArray = htmlData.match(/([A-Z]|[0-9])[^<]*<br>[^\d]*\d*/g);
@@ -161,7 +189,6 @@ function putBusinessAttributesIntoJSONFormatFrom(htmlData, city, state)
             businessObjectArray.push(businessObject);
         }
     }
-    console.log('Array Count: ' + businessObjectArray.length);
     return businessObjectArray;
 }
 

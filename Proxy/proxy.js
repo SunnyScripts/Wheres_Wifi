@@ -11,6 +11,41 @@
 var http = require('http');
 var execute = require('child_process').exec;
 
+var listeningPort = 8000;
+
+var interpreterIP = '10.240.212.83';//internal ip
+var interpreterPort = 9000;
+
+//node proxy.js <port> <ip> <port>
+
+if(process.argv[2])
+{
+    if(process.argv[2].length == 4)
+    {
+        listeningPort = Number(process.argv[2]);
+    }
+}
+
+if(process.argv[3])
+{
+    if(process.argv[3].length > 4)
+    {
+        interpreterIP = process.argv[3];
+    }
+    else if(process.argv[3] == 4)
+    {
+        interpreterPort = Number(process.argv[3]);
+    }
+}
+
+if(process.argv[4])
+{
+    interpreterPort = Number(process.argv[4]);
+}
+
+
+
+
 
 http.createServer(function (request, response)
 {
@@ -29,27 +64,25 @@ http.createServer(function (request, response)
         response.end();
     });
 
-}).listen(8080);
-//TODO: set up internal listening
-console.log('listening 8080');
+}).listen(listeningPort);
 
+console.log('listening on port: ' + listeningPort);
+console.log('sending http response to the interpreter at IP: ' + interpreterIP + ' on Port: ' + interpreterPort);
 
 
 function processRequestAndExecute(body)
 {
-    //TODO: are all these variables needed?
     var json = JSON.parse(body);
 
     var cityObjectString = commandLineEncodeObjectString(JSON.stringify(json.cityObject));
-    var urlString = commandLineEncodeObjectString(JSON.stringify(json.requestURL));
+    var requestURLString = JSON.stringify(json.requestURL);
     var executableFileName = 'phantomRequest.js';
+    var interpreterURLString = '"http://' + interpreterIP + ':' + interpreterPort + '/"';
 
-    console.log('cityJSON:\n'+cityObjectString);
-    //console.log(urlString);
+    var standardOutputString = 'phantomjs ' +  executableFileName + ' ' + cityObjectString + ' ' + requestURLString + ' ' + interpreterURLString;
 
-    var standardOutputString = 'phantomjs ' +  executableFileName + ' ' + cityObjectString + ' ' + urlString;
+    console.log('Output String \n' + standardOutputString);
 
-    //TODO: is this variable needed
     var childProcess = execute(standardOutputString, function(error, standardOutput, standardOutputError)
     {
         console.log('stdout: ' + standardOutput);

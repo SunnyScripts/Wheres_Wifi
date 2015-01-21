@@ -16,39 +16,51 @@ var system = require('system');
 var standardError = system.stderr;
 var argumentsArray = system.args;
 
+
+
 var page = require('webpage').create();
-var interpreterURL = 'http://localhost:8888/';
+
 
 //order of arguments:
 //0: file name
 //1: city json
 //2: request url
+//3: interpreter url
 
 
-var cityObject = null;
 
-//TODO: accept arguments in either order
-
-if(argumentsArray.length != 3)
+if(argumentsArray.length != 4)
 {
     standardError.write('wrong number of arguments passed');
     phantom.exit(1);
 }
 
+console.log(argumentsArray[3]);
+
 var cityObjectString = argumentsArray[1].replace(/\\/g, '');
-cityObject = JSON.parse(cityObjectString);
+var cityObject = JSON.parse(cityObjectString);
 
 var urlRequest = argumentsArray[2];
 
+page.settings.userAgent = JSON.stringify(cityObject.userAgent);
 
-page.settings.userAgent = cityObject.userAgent;
-
-
-
-
-//TODO: settings?, status?
-page.open(urlRequest,/*settings*/ function()
+page.open(urlRequest,/*settings*/ function(status)
 {
+    console.log('url request: ' + urlRequest);
+    console.log('user agent: ' + page.settings.userAgent);
+    console.log('url request status: ' + status);
+
+    page.onResourceReceived = function(response)
+    {
+        //console.log('status code: ' + response.status);
+    };
+
+    if(status == 'fail')
+    {
+        standardError.writeLine('url request failed');
+        phantom.exit();
+    }
+
     var evaluation = page.evaluate(function()
     {
 
@@ -62,15 +74,15 @@ page.open(urlRequest,/*settings*/ function()
 
     requestBody = JSON.stringify(requestBody);
 
-    page.open(interpreterURL, 'POST', requestBody, function(status)
+    page.open(argumentsArray[3], 'POST', requestBody, function(status)
     {
-        if(status == 'failure')
+        if(status == 'fail')
         {
-            standardError.write('POST to htmlInterpreter.js FAILED');
+            standardError.writeLine('POST to htmlInterpreter.js FAILED');
         }
         else
         {
-            console.log(status);
+            console.log('interpreter send status: ' + status);
         }
         phantom.exit();
     });
