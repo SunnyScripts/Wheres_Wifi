@@ -37,7 +37,7 @@ fs.readFile('cityList.json', 'utf8', function(error, data)
             'state': citiesArray[i].state,
             'isLogCompleted': false,
             'dateLogCompleted': null,
-            'proxyIP': null,
+            'proxyURL': null,
             'lastPageRequest': null
         };
 
@@ -62,9 +62,7 @@ fs.readFile('cityList.json', 'utf8', function(error, data)
                 }
             });
         }
-
     }
-
 });
 
 function shuffleTheArray(array)
@@ -85,7 +83,6 @@ function shuffleTheArray(array)
         array[m] = array[i];
         array[i] = t;
     }
-
     return array;
 }
 

@@ -5,17 +5,44 @@
  * -Synopsis-
  *  create url requests at random intervals with city data
  *  send request to proxy
+ *
+ *  Arguments:
+ *
+ *  node filename.js <[what proxies to use?] local [localhost], internal[local in cloud, is default]> <proxyPort || databaseIP> <databaseIP>
  */
 
+    //TODO: simplify file arguments, use flags? man page?
 
  // Initialize Global Variables \\
 //===============================\\
 
-
 var mongojs = require('mongojs');
 var request = require('request');
 
-var db = mongojs('###.###.###.###/Wheres_Wifi', ['cities', 'userAgents']);
+var proxyPort = 8000;
+var databaseIP = '10.240.212.83';//internal
+
+if(process.argv[3])
+{
+    if(process.argv[3].length == 4)
+    {
+        proxyPort = process.argv[3];
+    }
+    else
+    {
+        databaseIP = process.argv[3];
+    }
+}
+
+if(process.argv[4])
+{
+    databaseIP = process.argv[4];
+}
+
+
+var db = mongojs(databaseIP+ ':7000/Wheres_Wifi', ['cities', 'userAgents']);
+
+//node mainDirector.js <internal, external, local> <proxyPort> <databaseIP>
 
 //between 100 to 200 requests are made, then an idle runs 9 to 28 minutes
 var requestCounter = 0;
@@ -48,7 +75,7 @@ function checkDatabaseCompletionCount()
     {
         console.log(databaseCount + ' cities left to scrape');
 
-        if(databaseCount == 0)
+        if(databaseCount === 0)
         {
             throw Error('no cities left to scrape');
         }
@@ -118,11 +145,25 @@ function main()
         {
             console.log(cityObject);
 
-            buildRequestFrom(cityObject);
+            buildRequestOptionsFrom(cityObject);
+            mainTimer();
         }
         else
         {
-            {console.log('no city object found');}
+            db.cities.findOne({'isLogCompleted': false}, function(error, altCityObject)
+            {
+                if(altCityObject)
+                {
+                    console.log(altCityObject);
+
+                    buildRequestOptionsFrom(altCityObject);
+                    mainTimer();
+                }
+                else
+                {
+                    throw Error('no city object found');
+                }
+            });
         }
 
 
@@ -131,21 +172,19 @@ function main()
     numberArrayCurrentIndex++;
 }
 
-function buildRequestFrom(cityObject)
+function buildRequestOptionsFrom(cityObject)
 {
     var requestURLString = 'http://www.yelp.com/search?attrs=WiFi.free&l=p:' + cityObject.state + ':' + cityObject.city + '::';
-    var proxyIP = 'http://localhost:8080/';
     var requestOptions = {};
 
 
-    if(cityObject.userAgentID)
+    if(cityObject.userAgent)//business already exists
     {
-        requestURLString = requestString + ' &start=' + (cityObject.lastPageRequest * 10);
+        requestURLString = requestURLString + '&start=' + (cityObject.lastPageRequest * 10);
 
         requestOptions =
         {
-            //TODO: pick from 1 of 3 proxies, save result in city object (update database)
-            uri: cityObject.proxyIP,
+            uri: cityObject.proxyURL,
             body:
             {
                 'requestURL': requestURLString,
@@ -157,24 +196,8 @@ function buildRequestFrom(cityObject)
 
         makeRequestWithOptions(requestOptions);
     }
-    else
+    else//no business data
     {
-        var proxyIndex = createWholeRandomNumberWith(0, 2);
-
-        switch (proxyIndex)
-        {
-            case 0:
-                proxyIP = 'http://localhost:8080/';
-                break;
-            case 1:
-                proxyIP = 'http://localhost:8080/';
-                break;
-            case 2:
-                proxyIP = 'http://localhost:8080/';
-                break
-        }
-
-        //TODO: update proxy ip in cities collection
 
         //when a random index is chosen for the user agent probability array,
         //the probability for any random rank matches the probability array
@@ -190,17 +213,16 @@ function buildRequestFrom(cityObject)
             if(error) { throw error; }
 
             cityObject.userAgent = userAgentObject._id;
+            var proxyURL = 'http://' + getARandomProxyIP() + ':' + proxyPort;
 
-
-            db.userAgents.update({'_id': cityObject._id}, {$set: {'userAgent': cityObject.userAgent}}, function(error)
+            db.cities.update({'_id': cityObject._id}, {$set: {'userAgent': cityObject.userAgent, 'proxyURL': proxyURL}}, function(error)
             {
                 if(error) { throw error; }
             });
 
             requestOptions =
             {
-                //TODO: pick from 1 of 3 proxies, save result in city object (update database)
-                uri: proxyIP,
+                uri: proxyURL,
                 body:
                 {
                     'requestURL': requestURLString,
@@ -213,9 +235,13 @@ function buildRequestFrom(cityObject)
             makeRequestWithOptions(requestOptions);
         });
     }
-
-    mainTimer();
 }
+
+
+
+
+ // Utility Functions \\
+//=====================\\
 
 function makeRequestWithOptions(options)
 {
@@ -225,14 +251,9 @@ function makeRequestWithOptions(options)
     {
         //TODO: more gracefully handle errors?
         if(error) { throw error; }
-        //TODO:handle internal proxy errors, response.statusCode
+        //TODO: handle internal proxy errors, response.statusCode
     });
 }
-
-
- // Utility Functions \\
-//=====================\\
-
 
 function minutesToMilliseconds(minutes)
 {
@@ -242,6 +263,26 @@ function minutesToMilliseconds(minutes)
 function createWholeRandomNumberWith(minimumValue, maximumValue)
 {
     return Math.floor(Math.random()*(maximumValue - minimumValue + 1) + minimumValue);
+}
+
+function getARandomProxyIP()
+{
+    if(process.argv[2] === 'local')
+    {
+        return 'localhost';
+    }
+    else //default action, internal
+    {
+        switch(createWholeRandomNumberWith(0, 2))
+        {
+            case 0:
+                return '10.240.175.93';
+            case 1:
+                return '10.240.98.58';
+            default:
+                return '10.240.7.5';
+        }
+    }
 }
 
 function createShuffledNumberArrayWithSize(arraySize)

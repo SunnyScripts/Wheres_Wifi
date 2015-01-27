@@ -13,7 +13,7 @@ var execute = require('child_process').exec;
 
 var listeningPort = 8000;
 
-var interpreterIP = '10.240.212.83';//internal ip
+var interpreterIP = '10.240.162.148';//internal ip 10.240.162.148
 var interpreterPort = 9000;
 
 //node proxy.js <port> <ip> <port>
@@ -42,10 +42,6 @@ if(process.argv[4])
 {
     interpreterPort = Number(process.argv[4]);
 }
-
-
-
-
 
 http.createServer(function (request, response)
 {

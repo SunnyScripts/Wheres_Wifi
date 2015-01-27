@@ -1,25 +1,34 @@
 /**
+ * Version 1.0.0
+ *
  * Created by Ryan Berg on 12/9/14.
  * rberg2@hotmail.com
  *
- * htmlInterpreter.js parses html to json, sets business database documents, and updates the cities database
  *
+ * -Synopsis-
+ *  parses html to json, sets business documents to database, and updates the cities database
+ *
+ *  Arguments:
+ *
+ * node fileName.js <listeningPort [default 9000] || String(databaseIP), external, internal[default]>
  */
 
-    //TODO: add more commenting for clarity
+const cityRequestLimit = 25;
 
 var http = require('http');
 var mongojs = require('mongojs');
 
-
 var databaseIP = '10.240.212.83';//internal ip
+const databasePort = 7000;
+
 var listeningPort = 9000;
+
 
 if(process.argv[2])
 {
     if(process.argv[2] === 'external')
     {
-        databaseIP = '130.211.163.79';
+        databaseIP = '146.148.81.137';
     }
     else if(process.argv[2].length > 4)
     {
@@ -37,7 +46,7 @@ if(process.argv[3])
 }
 
 
-var db = mongojs(databaseIP + '/Wheres_Wifi', ['businesses', 'cities']);
+var db = mongojs(databaseIP + ':' + databasePort + '/Wheres_Wifi', ['businesses', 'cities']);
 
 
 http.createServer(function(request, response)
@@ -55,7 +64,6 @@ http.createServer(function(request, response)
         console.log('request received');
         response.end();
 
-        console.log(body);
         parseHtml(body);
     });
 
@@ -71,15 +79,24 @@ function parseHtml(body)
     var cityObject = json.cityObject;
     var htmlData = json.htmlData;
 
-    //find available pages in htmlData
-    var pageCountMatchArray = htmlData.match(/Page 1 of \d*/g);
-    console.log(pageCountMatchArray);
+    //find how many pages are available and what page we are on
+    var pageCountMatchArray = htmlData.match(/Page \d{1,2} of \d+/g);
+    console.log('pages available: ' + pageCountMatchArray + ' in ' + cityObject._id);
 
     if(pageCountMatchArray)//page has results
     {
-        var pageCount = Number(pageCountMatchArray[0].replace('Page 1 of ', /*with*/''));
+        var pageCount = Number(pageCountMatchArray[0].replace(/Page \d{1,2} of /, /*with*/''));
+        var currentPage = Number(pageCountMatchArray[0].match(/\d{1,2}/)[0]);
 
-        updateCityObject(cityObject._id, pageCount, cityObject.lastPageRequest + 1);
+        if(currentPage == cityRequestLimit)//limit requests
+        {
+            //setting pageCount to 0 sets the city as complete
+            updateCityObject(cityObject._id, 0, currentPage)
+        }
+        else
+        {
+            updateCityObject(cityObject._id, pageCount, currentPage);
+        }
 
         db.businesses.insert(putBusinessAttributesIntoJSONFormatFrom(htmlData, cityObject.city, cityObject.state), function(error)
         {
@@ -92,13 +109,12 @@ function parseHtml(body)
     }
 }
 
-function updateCityObject(cityObjectID, pagesAvailable, currentPageRequest)
+function updateCityObject(cityObjectID, pageCount, currentPageRequest)
 {
-    if(pagesAvailable < 2 || pagesAvailable - currentPageRequest == 0)
+    if(pageCount < 2 || pageCount - currentPageRequest == 0)
     {
-        db.cities.update({'_id': cityObjectID}, {$set: {'isLogCompleted': true, 'dateLogCompleted': new Date(), 'lastPageRequest': currentPageRequest}}, function(error)
+        db.cities.update({'_id': cityObjectID}, {$set: {'isLogCompleted': true, 'dateLogCompleted': new Date().toISOString(), 'lastPageRequest': currentPageRequest}}, function(error)
         {
-            //TODO: failed to connect to database
             if(error) { throw error; }
         });
     }
@@ -113,7 +129,7 @@ function updateCityObject(cityObjectID, pagesAvailable, currentPageRequest)
 
 
 
-function putBusinessAttributesIntoJSONFormatFrom(htmlData, city, state)
+function putBusinessAttributesIntoJSONFormatFrom(htmlData, city, state)//returns array of objects
 {
     //bloated array will contain all matches with some extra around the edges
     //find and replace trims each entry in the bloated array
@@ -138,9 +154,9 @@ function putBusinessAttributesIntoJSONFormatFrom(htmlData, city, state)
 
     // address \\
     bloatedArray = htmlData.match(/([A-Z]|[0-9])[^<]*<br>[^\d]*\d*/g);
+    var zipCodeArray = findAndReplaceWith(/>[\S\s]*/, bloatedArray, /\D*/);
     var addressArray = findAndReplaceWith(/[\s\S]*/, bloatedArray, '<br>', ', ');
     var streetNameArray = findAndReplaceWith(/[^,]+/, addressArray);
-    var zipCodeArray = findAndReplaceWith(/\d{5}/, addressArray);
 
 
     // latitude and longitude \\
@@ -182,8 +198,6 @@ function putBusinessAttributesIntoJSONFormatFrom(htmlData, city, state)
                 longitude: Number(longitudeArray[i]),
                 ratingCount: 0,
                 ratingAverage: null
-                //TODO: break world map into tiles base on zoom level
-                //TODO: remove or update all old entries that don't follow the new pattern
             };
 
             businessObjectArray.push(businessObject);
@@ -196,7 +210,7 @@ function putBusinessAttributesIntoJSONFormatFrom(htmlData, city, state)
  // Utility Functions \\
 //=====================\\
 
-
+//TODO: describe arguments
 function findAndReplaceWith(matchRegex, searchArray, replaceRegex, replacementString, isReturnValueAnArrayOfArrays)
 {
     var attributeArray = [];
@@ -238,6 +252,11 @@ function findAndReplaceWith(matchRegex, searchArray, replaceRegex, replacementSt
                 for(var j = 0; j < regexMatchArray.length; j++)
                 {
                     regexMatchArray[j] = regexMatchArray[j].replace(replaceRegex, replacementString);
+
+                    if(regexMatchArray[j].match(/&amp;/))
+                    {
+                        regexMatchArray[j] = regexMatchArray[j].replace(/&amp;/, '&')
+                    }
                 }
                 attributeArray.push(regexMatchArray);
             }

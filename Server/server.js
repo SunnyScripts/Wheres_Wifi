@@ -8,7 +8,7 @@ var url = require('url');
 
 var mongojs = require('mongojs');
 
-var db = mongojs('###.###.###.###/Wheres_Wifi', ['cities']);
+var db = mongojs('130.211.163.79/Wheres_Wifi', ['cities']);
 
 var fileData;
 
