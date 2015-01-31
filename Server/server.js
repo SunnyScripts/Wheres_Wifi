@@ -7,69 +7,89 @@ var http = require("http");
 var url = require('url');
 
 var mongojs = require('mongojs');
+var zlib = require('zlib');
 
-var db = mongojs('130.211.163.79/Wheres_Wifi', ['cities']);
+var db = mongojs('10.240.212.83:7000/Wheres_Wifi', ['businesses']);//146.148.81.137
 
-var fileData;
+const oneMileInDegrees = .016666666666667;
 
-//bounds address category sort?
+//bounds category sort?
 
-var fs = require('fs');
-
-fs.readFile('cityList.json', 'utf8', function(error, data)
-{
-    fileData = data;
-});
+//API
+//http://serverIP:6000/search?latitude=aNumber&longitude=aNumber&raduis=aNumberInMiles
 
 //TODO: create a static html file to serve
-//TODO: default /search result?
-//TODO: router: / /search (others?, switch case?)
-//TODO: create a password field
+//TODO: authentication, create a password field
+//TODO: rate limiting?
+//TODO: SSL
 
 http.createServer(function(request, response)
 {
-    console.log('request received');
-
-    console.log(request.url);
 
     queryJson = url.parse(request.url,true).query;
     var pathname = url.parse(request.url,true).pathname;
 
-    if(pathname != '/search')
-    {
-        response.writeHead(404, {"Content-Type": "text/plain"});
-        response.write('I\'m looking for a url with pathname \n\n/search\n\nand parameters: \n\nbounds={topLeft(point), topRight(point), bottomLeft(point), bottomRight(point)} \nor address=String()\n\nwith optional parameters:\n\ncategory or sortMethod');
-        response.end();
+    console.log('request received: ' + JSON.stringify(queryJson));
 
-    }
-    else if(queryJson.bounds && !queryJson.address)
-    {
-        console.log('bounds');
-        response.writeHead(200, {"Content-Type": "text/plain"});
-        response.end('dragon node');
-    }
-    else if(!queryJson.bounds && queryJson.address)
-    {
-        var json = [{'type': 'apple'}, {'type': 'orange'}];
-        console.log('address');
 
-        db.cities.findOne({}, function(error, value)
+    if(pathname =='/search' && queryJson.latitude && queryJson.longitude)
+    {
+        if(!queryJson.radius || queryJson.radius <= 0)
         {
-            if(error)
+            queryJson.raduis = 1;//mile
+        }
+
+        db.businesses.find(
             {
-                console.log(error);
+                latitude:
+            {
+                $lt:Number(queryJson.latitude) + (queryJson.radius * oneMileInDegrees),/*North boundary*/
+                $gt:Number(queryJson.latitude) - (queryJson.radius * oneMileInDegrees)/*South boundary*/
+            },
+                longitude:
+                {
+                    $gt:Number(queryJson.longitude) - (queryJson.radius * oneMileInDegrees),/*West boundary*/
+                    $lt:Number(queryJson.longitude) + (queryJson.radius * oneMileInDegrees)/*East boundary*/
+                }
+            },
+            function(error, businessObjects)
+        {
+            if(error) { throw error; }
+
+            //gzip supported
+            if(businessObjects && request.headers['accept-encoding'].match(/\bgzip\b/i))
+            {
+                zlib.gzip(JSON.stringify(businessObjects), function(error, buffer)
+                {
+                    if(error) { throw error; }
+
+                    response.writeHead(200, {"Content-Type": "application/json", "Content-Encoding": "gzip"});
+                    response.write(buffer);
+                    response.end();
+
+                });
             }
-            response.writeHead(200, {"Content-Type": "application/json"});
-            console.log(value);
-            response.write(JSON.stringify(value));
-            response.end();
+            //gzip not supported
+            else
+            {
+                response.writeHead(200, {"Content-Type": "application/json"});
+                response.write(JSON.stringify(businessObjects));
+                response.end();
+            }
         });
-
-
     }
+    else
+    {
+        var jsonErrorMessage =
+        {
+            "message" : "Error in URL",
+            "description" : "The API requires a latitude and longitude at the search path.",
+            "exampleURL": "http://localhost:6000/search?latitude=aNumber&longitude=aNumber"
+        };
 
-
-
-}).listen(8888);
-
-console.log('server started. listening on port 8888');
+        response.writeHead(404, {"Content-Type": "application/json"});
+        response.write(JSON.stringify(jsonErrorMessage));
+        response.end();
+    }
+}).listen(10000);
+console.log('server started. listening on port 10000');

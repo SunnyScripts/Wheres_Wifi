@@ -11,7 +11,7 @@
 #
 #// :To Use: \\#
 #$ chmod +x <thisfile.name> #make executable
-#$ ./<thisfile.name #execute
+#$ ./<thisfile.name> #execute
 #
 # available at: https://drive.google.com/uc?export=download&id=0B6jk8rzz3GfVTFREbmNwRmxndjQ
 #

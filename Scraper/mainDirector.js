@@ -120,7 +120,7 @@ function mainTimer()
             requestMaximum = createWholeRandomNumberWith(100, 200);
             console.log('run main timer');
             mainTimer();
-        }, createWholeRandomNumberWith(minutesToMilliseconds(9), minutesToMilliseconds(28)));
+        }, createWholeRandomNumberWith(minutesToMilliseconds(4), minutesToMilliseconds(7)));
     }
 
 }

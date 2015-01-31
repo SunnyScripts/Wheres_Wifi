@@ -44,7 +44,7 @@ var urlRequest = argumentsArray[2];
 
 page.settings.userAgent = JSON.stringify(cityObject.userAgent);
 
-page.open(urlRequest,/*settings*/ function(status)
+page.open(urlRequest, function(status)
 {
     console.log('url request: ' + urlRequest);
     console.log('user agent: ' + page.settings.userAgent);
@@ -66,15 +66,20 @@ page.open(urlRequest,/*settings*/ function(status)
 
     });
 
-    var requestBody =
+    var settings =
     {
-        'cityObject': cityObject,
-        'htmlData': page.content
+        operation: "POST",
+        encoding: "utf8",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        data: JSON.stringify({
+            htmlData:page.content,
+            cityObject: cityObject
+        })
     };
 
-    requestBody = JSON.stringify(requestBody);
-
-    page.open(argumentsArray[3], 'POST', requestBody, function(status)
+    page.open(argumentsArray[3], settings, function(status)
     {
         if(status == 'fail')
         {

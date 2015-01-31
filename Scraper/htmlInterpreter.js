@@ -61,7 +61,6 @@ http.createServer(function(request, response)
     request.on('end', function ()
     {
         response.writeHead(200);
-        console.log('request received');
         response.end();
 
         parseHtml(body);
@@ -78,6 +77,8 @@ function parseHtml(body)
 
     var cityObject = json.cityObject;
     var htmlData = json.htmlData;
+
+    json = null;
 
     //find how many pages are available and what page we are on
     var pageCountMatchArray = htmlData.match(/Page \d{1,2} of \d+/g);
@@ -135,8 +136,8 @@ function putBusinessAttributesIntoJSONFormatFrom(htmlData, city, state)//returns
     //find and replace trims each entry in the bloated array
     //and finally, a for loop organizes the arrays into json
 
-    var bloatedArray = htmlData.match(/class="biz-name"[\s\S]*?<\/a>/g);
-    var closedArray = findAndReplaceWith(/CLOSED/, bloatedArray);
+    var bloatedArray = htmlData.match(/\d\.[^<]*<a class="biz-name"[\s\S]*?<\/a>/g);
+    var closedArray = findAndReplaceWith(/CLOSED|MOVED/, bloatedArray);
 
     // id and name \\
     var idArray = findAndReplaceWith(/biz\/[^"]*/, bloatedArray, 'biz/');
@@ -222,48 +223,41 @@ function findAndReplaceWith(matchRegex, searchArray, replaceRegex, replacementSt
         replacementString = '';
     }
 
-    for(var i = 0; i < searchArray.length; i++)
+    if(searchArray)
     {
-        regexMatchArray = searchArray[i].match(matchRegex);
-
-
-        if(regexMatchArray)//a match was found
+        for (var i = 0; i < searchArray.length; i++)
         {
-            if(!isReturnValueAnArrayOfArrays)//push string to array
+            regexMatchArray = searchArray[i].match(matchRegex);
+
+
+            if (regexMatchArray)//a match was found
             {
-                if(replaceRegex)
+                if (!isReturnValueAnArrayOfArrays)//push string to array
                 {
-                    businessString = regexMatchArray[0].replace(replaceRegex, replacementString);
-                }
-                else
-                {
-                    businessString = regexMatchArray[0];
-                }
-
-                if(businessString.match(/&amp;/))
-                {
-                    businessString = businessString.replace(/&amp;/, '&')
-                }
-
-                attributeArray.push(businessString);
-            }
-            else//push array to array
-            {
-                for(var j = 0; j < regexMatchArray.length; j++)
-                {
-                    regexMatchArray[j] = regexMatchArray[j].replace(replaceRegex, replacementString);
-
-                    if(regexMatchArray[j].match(/&amp;/))
+                    if (replaceRegex)
                     {
-                        regexMatchArray[j] = regexMatchArray[j].replace(/&amp;/, '&')
+                        businessString = regexMatchArray[0].replace(replaceRegex, replacementString);
                     }
+                    else
+                    {
+                        businessString = regexMatchArray[0];
+                    }
+                    attributeArray.push(decodeURI(businessString));
                 }
-                attributeArray.push(regexMatchArray);
+                else//push array to array
+                {
+                    for (var j = 0; j < regexMatchArray.length; j++)
+                    {
+                        regexMatchArray[j] = regexMatchArray[j].replace(replaceRegex, replacementString);
+                        regexMatchArray[j] = regexMatchArray[j].replace(/&amp;/, '&');
+                    }
+                    attributeArray.push(regexMatchArray);
+                }
             }
-        }
-        else
-        {
-            attributeArray.push(null);
+            else//no match found
+            {
+                attributeArray.push(null);
+            }
         }
     }
     return attributeArray;
