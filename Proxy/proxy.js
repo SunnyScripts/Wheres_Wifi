@@ -82,27 +82,11 @@ function processRequestAndExecute(body)
         console.log('stdout: ' + standardOutput);
         if(standardOutputError)
         {
-            if(standardOutputError.match(/url request failed/))
-            {
-                //transporter.sendMail({
-                //    from: 'rberg2@hotmail.com',
-                //    to: '4082059191@vtext.com',
-                //    subject: '',
-                //    text: 'ERROR in phantomRequest: url request failed'
-                //});
-            }
             console.log('\nstandard error: ' + standardOutputError);
         }
 
         if (error !== null)
         {
-            //transporter.sendMail({
-            //    from: 'rberg2@hotmail.com',
-            //    to: '4082059191@vtext.com',
-            //    subject: '',
-            //    text: 'ERROR in proxy: child execution: '+ error
-            //});
-
             //phantomjs.kill('SIGKILL');
             console.log('\nchild execution error: ' + error);
         }
