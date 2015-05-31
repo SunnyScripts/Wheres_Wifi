@@ -10,21 +10,13 @@
 
 var http = require('http');
 var execute = require('child_process').exec;
-//var nodemailer = require('nodemailer');
-//
-//var transporter = nodemailer.createTransport({
-//    service: 'gmail',
-//    auth: {
-//        user: 'rbcerto',
-//        pass: 'rightAID0'
-//    }
-//});
 
 var listeningPort = 8000;
 
 var interpreterIP = '10.240.162.148';//internal ip 10.240.162.148
 var interpreterPort = 9000;
 
+//shell arguments
 //node proxy.js <port> <ip> <port>
 
 if(process.argv[2])
