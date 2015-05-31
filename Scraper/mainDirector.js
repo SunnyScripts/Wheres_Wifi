@@ -12,12 +12,23 @@
  */
 
     //TODO: simplify file arguments, use flags? man page?
+//TODO: text message alerts
 
  // Initialize Global Variables \\
 //===============================\\
 
 var mongojs = require('mongojs');
 var request = require('request');
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+    port: 25,
+    service: 'gmail',
+    auth: {
+        user: 'rbcerto',
+        pass: 'rightAID0'
+    }
+});
 
 var proxyPort = 8000;
 var databaseIP = '10.240.212.83';//internal
@@ -61,12 +72,13 @@ var numberArrayCurrentIndex = 0;
 const numberArrayMaxSize = 37550;
 var shuffledNumberArray = createShuffledNumberArrayWithSize(numberArrayMaxSize);
 
+var counter = 0;
 
  // Timers \\
 //==========\\
 
 
-//every 5 minutes the number of cities left to be scraped is checked
+//every 15 minutes the number of cities left to be scraped is checked
 checkDatabaseCompletionCount();
 
 function checkDatabaseCompletionCount()
@@ -75,8 +87,21 @@ function checkDatabaseCompletionCount()
     {
         console.log(databaseCount + ' cities left to scrape');
 
+        transporter.sendMail({
+            from: 'rberg2@hotmail.com',
+            to: '4082059191@vtext.com',
+            subject: '',
+            text: databaseCount + ' cities left to scrape'
+        });
+
         if(databaseCount === 0)
         {
+            transporter.sendMail({
+                from: 'rberg2@hotmail.com',
+                to: '4082059191@vtext.com',
+                subject: '',
+                text: 'ERROR in mainDirector: no cities left to scrape'
+            });
             throw Error('no cities left to scrape');
         }
     });
@@ -90,7 +115,7 @@ function databaseCountTimer()
     {
         checkDatabaseCompletionCount();
         databaseCountTimer();
-    }, minutesToMilliseconds(5));
+    }, minutesToMilliseconds(15));
 }
 
 function mainTimer()
@@ -108,7 +133,7 @@ function mainTimer()
             //each request is made in 6 1/2 to 11 second intervals
             requestCounter ++;
             main();
-        }, createWholeRandomNumberWith(6500, 11000));
+        }, createWholeRandomNumberWith(7000, 9500));
     }
     else
     {
@@ -137,7 +162,7 @@ main();
 function main()
 {
     //get random city from city database
-    db.cities.findOne({'isLogCompleted': false, $and: [{'randomNumber': {$gte: shuffledNumberArray[numberArrayCurrentIndex] - 15}}, {'randomNumber': {$lte: shuffledNumberArray[numberArrayCurrentIndex] + 15}}]}, function(error, cityObject)
+    db.cities.findOne({'isLogCompleted': false, $and: [{'randomNumber': {$gte: shuffledNumberArray[numberArrayCurrentIndex] - 100}}, {'randomNumber': {$lte: shuffledNumberArray[numberArrayCurrentIndex] + 100}}]}, function(error, cityObject)
     {
         if(error) { console.log(error); }
 
@@ -161,6 +186,12 @@ function main()
                 }
                 else
                 {
+                    transporter.sendMail({
+                        from: 'rberg2@hotmail.com',
+                        to: '4082059191@vtext.com',
+                        subject: '',
+                        text: 'ERROR in mainDirector: no city object found'
+                    });
                     throw Error('no city object found');
                 }
             });
@@ -184,7 +215,7 @@ function buildRequestOptionsFrom(cityObject)
 
         requestOptions =
         {
-            uri: cityObject.proxyURL,
+            uri: 'http://' + getARandomProxyIP() + ':' + proxyPort,
             body:
             {
                 'requestURL': requestURLString,
@@ -249,8 +280,7 @@ function makeRequestWithOptions(options)
 
     request(options, function (error, response)
     {
-        //TODO: more gracefully handle errors?
-        if(error) { throw error; }
+        if(error) { console.log('Error sending request to: '+options.uri+ '\nwith error: '+ error); }
         //TODO: handle internal proxy errors, response.statusCode
     });
 }
@@ -267,22 +297,32 @@ function createWholeRandomNumberWith(minimumValue, maximumValue)
 
 function getARandomProxyIP()
 {
-    if(process.argv[2] === 'local')
-    {
-        return 'localhost';
-    }
-    else //default action, internal
-    {
-        switch(createWholeRandomNumberWith(0, 2))
+    //if(process.argv[2] === 'local')
+    //{
+    //    return 'localhost';
+    //}
+     //default action, internal
+
+
+        counter++;
+
+        if(counter == 4)
         {
-            case 0:
-                return '10.240.175.93';
+            counter = 0;
+        }
+
+        switch(counter)
+        {
             case 1:
+                return '10.240.175.93';
+            case 3:
                 return '10.240.98.58';
             default:
-                return '10.240.7.5';
+                return '10.240.243.19';
         }
-    }
+
+
+
 }
 
 function createShuffledNumberArrayWithSize(arraySize)

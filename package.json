@@ -2,12 +2,13 @@
   "name": "Where's Wifi",
   "version": "1.0.0",
   "description" : "Manage community rated wifi",
-  "homepage" : null,
+  "homepage" : "http://turingweb.com",
   "author" : "Ryan Berg <rberg2@hotmail.com>",
   "dependencies" :
   {
     "request": "latest",
-    "mongojs": "latest"
+    "mongojs": "latest",
+    "zlib": "latest"
   },
   "repository" : {"type": "git", "url": "git://github.com/mintScripts/Wheres_Wifi"},
   "main" : "mainDirector.js"

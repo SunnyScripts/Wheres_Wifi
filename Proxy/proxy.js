@@ -10,6 +10,15 @@
 
 var http = require('http');
 var execute = require('child_process').exec;
+//var nodemailer = require('nodemailer');
+//
+//var transporter = nodemailer.createTransport({
+//    service: 'gmail',
+//    auth: {
+//        user: 'rbcerto',
+//        pass: 'rightAID0'
+//    }
+//});
 
 var listeningPort = 8000;
 
@@ -54,10 +63,10 @@ http.createServer(function (request, response)
 
     request.on('end', function ()
     {
-        processRequestAndExecute(body);
-
         response.writeHead(200);
         response.end();
+
+        processRequestAndExecute(body);
     });
 
 }).listen(listeningPort);
@@ -70,23 +79,40 @@ function processRequestAndExecute(body)
 {
     var json = JSON.parse(body);
 
-    var cityObjectString = commandLineEncodeObjectString(JSON.stringify(json.cityObject));
-    var requestURLString = JSON.stringify(json.requestURL);
-    var executableFileName = 'phantomRequest.js';
-    var interpreterURLString = '"http://' + interpreterIP + ':' + interpreterPort + '/"';
+    var standardOutputString = 'phantomjs phantomRequest.js ' + commandLineEncodeObjectString(JSON.stringify(json.cityObject)) + ' ' + JSON.stringify(json.requestURL) + ' ' + '"http://' + interpreterIP + ':' + interpreterPort + '/"';
+    json = null;
 
-    var standardOutputString = 'phantomjs ' +  executableFileName + ' ' + cityObjectString + ' ' + requestURLString + ' ' + interpreterURLString;
 
-    console.log('Output String \n' + standardOutputString);
-
-    var childProcess = execute(standardOutputString, function(error, standardOutput, standardOutputError)
+    var phantomjs = execute(standardOutputString, {timeout:6999}, function(error, standardOutput, standardOutputError)
     {
+        //phantomjs.kill('SIGTERM');
+
         console.log('stdout: ' + standardOutput);
-        console.log('stderr: ' + standardOutputError);
+        if(standardOutputError)
+        {
+            if(standardOutputError.match(/url request failed/))
+            {
+                //transporter.sendMail({
+                //    from: 'rberg2@hotmail.com',
+                //    to: '4082059191@vtext.com',
+                //    subject: '',
+                //    text: 'ERROR in phantomRequest: url request failed'
+                //});
+            }
+            console.log('\nstandard error: ' + standardOutputError);
+        }
 
         if (error !== null)
         {
-            console.log('exec error: ' + error);
+            //transporter.sendMail({
+            //    from: 'rberg2@hotmail.com',
+            //    to: '4082059191@vtext.com',
+            //    subject: '',
+            //    text: 'ERROR in proxy: child execution: '+ error
+            //});
+
+            //phantomjs.kill('SIGKILL');
+            console.log('\nchild execution error: ' + error);
         }
     });
 }
@@ -99,7 +125,7 @@ function processRequestAndExecute(body)
 function commandLineEncodeObjectString(string)
 {
     //escape quotes for standard output
-    string = string.replace(/"|'/g, "\\\"");
+    string = string.replace(/"/g, "\\\"");
 
     //put json in quotes for standard output
     string = '"'+string+'"';

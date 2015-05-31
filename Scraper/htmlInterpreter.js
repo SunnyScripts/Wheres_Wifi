@@ -99,9 +99,14 @@ function parseHtml(body)
             updateCityObject(cityObject._id, pageCount, currentPage);
         }
 
-        db.businesses.insert(putBusinessAttributesIntoJSONFormatFrom(htmlData, cityObject.city, cityObject.state), function(error)
+        var scrapedJSONArray = 3;
+
+        db.businesses.insert(putBusinessAttributesIntoJSONFormatFrom(htmlData, cityObject.city, cityObject.state), {continueOnError: true, safe: true}, function(error)
         {
-            if(error) { throw error; }
+            if(error)
+            {
+                console.log('\n\n\nError:\n\n\n' + error); //TODO: use this change in finding lost data
+            }
         });
     }
     else//no results for city

@@ -3,11 +3,15 @@
  * rberg2@hotmail.com
  */
 
+
 var http = require("http");
-var url = require('url');
+
+var fs = require('fs');
 
 var mongojs = require('mongojs');
 var zlib = require('zlib');
+var requestLib = require('request');
+
 
 var db = mongojs('10.240.212.83:7000/Wheres_Wifi', ['businesses']);//146.148.81.137
 
@@ -16,21 +20,20 @@ const oneMileInDegrees = .016666666666667;
 //bounds category sort?
 
 //API
-//http://serverIP:6000/search?latitude=aNumber&longitude=aNumber&raduis=aNumberInMiles
-
-//TODO: create a static html file to serve
+//http://turingweb.com:10000/search?latitude=aNumber&longitude=aNumber&raduis=aNumberInMiles
 //TODO: authentication, create a password field
 //TODO: rate limiting?
 //TODO: SSL
-//TODO: log requests ip and date stamp
 
 http.createServer(function(request, response)
 {
+    var url = require('url');
 
     queryJson = url.parse(request.url,true).query;
     var pathname = url.parse(request.url,true).pathname;
 
     console.log('request received: ' + JSON.stringify(queryJson));
+    //logRequest(request.connection.remoteAddress);
 
 
     if(pathname =='/search' && queryJson.latitude && queryJson.longitude)
@@ -86,6 +89,53 @@ http.createServer(function(request, response)
             }
         });
     }
+    else if(pathname == '/wifi_check' && queryJson.business_id)
+    {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var urlString = 'http://www.yelp.com/biz/'+queryJson.business_id;
+
+        requestLib(urlString, function (error, responseHeader, body)
+        {
+            if (!error && responseHeader.statusCode == 200)
+            {
+                var regexResult = body.match(/<dt class="attribute-key">[^W]*Wi-Fi[\s\S]*?<\/dd>/g);
+
+                if(regexResult)
+                {
+                    regexResult = regexResult[0];
+                    if(regexResult.match(/Free/g))
+                    {
+                        response.writeHead(200, {"Content-Type": "text/plain"});
+                        response.end("free\n");
+                    }
+                    else if(regexResult.match(/Paid/g))
+                    {
+                        response.writeHead(200, {"Content-Type": "text/plain"});
+                        response.end("paid\n");
+                    }
+                    else
+                    {
+                        response.writeHead(200, {"Content-Type": "text/plain"});
+                        response.end("none\n");
+                    }
+                }
+                else//wifi: no
+                {
+                    response.writeHead(200, {"Content-Type": "text/plain"});
+                    response.end("none\n");
+                }
+            }
+            else//no wifi data
+            {
+                response.writeHead(200, {"Content-Type": "text/plain"});
+                response.end(error);
+            }
+        });
+
+
+    }
     else
     {
         var jsonErrorMessage =
@@ -101,3 +151,12 @@ http.createServer(function(request, response)
     }
 }).listen(10000);
 console.log('server started. listening on port 10000');
+
+
+
+function logRequest(ip)
+{
+    fs.appendFile('apiRequest.log', ',{_id:'+new Date()+',ip:'+ip+'}', function (error) {
+        if (error) console.log(error);
+    });
+}

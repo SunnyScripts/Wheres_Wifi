@@ -35,7 +35,7 @@ if(argumentsArray.length != 4)
     phantom.exit(1);
 }
 
-console.log(argumentsArray[3]);
+//console.log(argumentsArray[3]);
 
 var cityObjectString = argumentsArray[1].replace(/\\/g, '');
 var cityObject = JSON.parse(cityObjectString);
@@ -47,13 +47,12 @@ page.settings.userAgent = JSON.stringify(cityObject.userAgent);
 page.open(urlRequest, function(status)
 {
     console.log('url request: ' + urlRequest);
-    console.log('user agent: ' + page.settings.userAgent);
     console.log('url request status: ' + status);
 
-    page.onResourceReceived = function(response)
-    {
-        //console.log('status code: ' + response.status);
-    };
+    //page.onResourceReceived = function(response)
+    //{
+    //    //console.log('status code: ' + response.status);
+    //};
 
     if(status == 'fail')
     {
@@ -89,6 +88,11 @@ page.open(urlRequest, function(status)
         {
             console.log('interpreter send status: ' + status);
         }
+
+        page = null;
+        evaluation = null;
+        settings = null;
+
         phantom.exit();
     });
 });

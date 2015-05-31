@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <!--<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <title>Wifi Search</title>
+
+    <link rel="stylesheet" type="text/css" href="../css/wifi_search.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css"/>
+
+    <style>
+        @import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css");
+
+        .glyphicon-refresh-animate {
+            animation: spin .7s infinite linear;
+            -webkit-animation: spin2 .7s infinite linear;
+        }
+
+        @-webkit-keyframes spin2 {
+            from { -webkit-transform: rotate(0deg);}
+            to { -webkit-transform: rotate(360deg);}
+        }
+
+        @keyframes spin {
+            from { transform: scale(1) rotate(0deg);}
+            to { transform: scale(1) rotate(360deg);}
+        }
+    </style>
+
+    <script type="text/javascript" src="../js/jquery-2.1.4.min.js"></script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?signed_in=true&v=3.exp&libraries=places&key=AIzaSyA5NWQoICqCw7zbPJ2uXRiD0n3C0sQVaGQ"></script>
+    <script type="text/javascript" src="../js/googleMaps.js"></script>
+
+    <!--<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places"></script>-->
+
+</head>
+<body>
+    <div id="outer" class="outer">
+        <div class="middle">
+            <div class="inner">
+
+                <div id="spinner" class="spinner">
+                    <div class="bounce1"></div>
+                    <div class="bounce2"></div>
+                    <div class="bounce3"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <input id="pac-input" class="controls" type="text" placeholder="Address (US Only)" style="visibility: hidden">
+    <button id="pinButton" class="btn btn-default" style="position: absolute;bottom: 80px;right: 10px;z-index: 20;
+visibility: hidden; height: 22px; width: 22px; background: url('../images/pushPin.png') no-repeat seashell;
+ background-position: bottom center; outline-color: #4d90fe"></button>
+    <div id="map-canvas"></div>
+</body>
+</html>
