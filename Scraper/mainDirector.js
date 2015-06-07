@@ -89,8 +89,8 @@ function checkDatabaseCompletionCount()
 
         transporter.sendMail({
             from: 'rberg2@hotmail.com',
-            to: '4082059191@vtext.com',
-            subject: '',
+            to: 'rberg2@hotmail.com',
+            subject: 'cities left for scraper',
             text: databaseCount + ' cities left to scrape'
         });
 
@@ -98,8 +98,8 @@ function checkDatabaseCompletionCount()
         {
             transporter.sendMail({
                 from: 'rberg2@hotmail.com',
-                to: '4082059191@vtext.com',
-                subject: '',
+                to: 'rberg2@hotmail.com',
+                subject: 'scraper finished',
                 text: 'ERROR in mainDirector: no cities left to scrape'
             });
             throw Error('no cities left to scrape');
@@ -188,8 +188,8 @@ function main()
                 {
                     transporter.sendMail({
                         from: 'rberg2@hotmail.com',
-                        to: '4082059191@vtext.com',
-                        subject: '',
+                        to: 'rberg2@hotmail.com',
+                        subject: 'scraper error',
                         text: 'ERROR in mainDirector: no city object found'
                     });
                     throw Error('no city object found');

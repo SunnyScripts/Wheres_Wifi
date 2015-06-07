@@ -10,21 +10,13 @@
 
 var http = require('http');
 var execute = require('child_process').exec;
-//var nodemailer = require('nodemailer');
-//
-//var transporter = nodemailer.createTransport({
-//    service: 'gmail',
-//    auth: {
-//        user: 'rbcerto',
-//        pass: 'rightAID0'
-//    }
-//});
 
 var listeningPort = 8000;
 
 var interpreterIP = '10.240.162.148';//internal ip 10.240.162.148
 var interpreterPort = 9000;
 
+//shell arguments
 //node proxy.js <port> <ip> <port>
 
 if(process.argv[2])
@@ -90,27 +82,11 @@ function processRequestAndExecute(body)
         console.log('stdout: ' + standardOutput);
         if(standardOutputError)
         {
-            if(standardOutputError.match(/url request failed/))
-            {
-                //transporter.sendMail({
-                //    from: 'rberg2@hotmail.com',
-                //    to: '4082059191@vtext.com',
-                //    subject: '',
-                //    text: 'ERROR in phantomRequest: url request failed'
-                //});
-            }
             console.log('\nstandard error: ' + standardOutputError);
         }
 
         if (error !== null)
         {
-            //transporter.sendMail({
-            //    from: 'rberg2@hotmail.com',
-            //    to: '4082059191@vtext.com',
-            //    subject: '',
-            //    text: 'ERROR in proxy: child execution: '+ error
-            //});
-
             //phantomjs.kill('SIGKILL');
             console.log('\nchild execution error: ' + error);
         }
