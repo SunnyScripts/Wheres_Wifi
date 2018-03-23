@@ -25,8 +25,8 @@ var transporter = nodemailer.createTransport({
     port: 25,
     service: 'gmail',
     auth: {
-        user: 'rbcerto',
-        pass: 'rightAID0'
+        user: '****',
+        pass: '****'
     }
 });
 
@@ -187,8 +187,8 @@ function main()
                 else
                 {
                     transporter.sendMail({
-                        from: 'rberg2@hotmail.com',
-                        to: 'rberg2@hotmail.com',
+                        from: '****',
+                        to: '****',
                         subject: 'scraper error',
                         text: 'ERROR in mainDirector: no city object found'
                     });
