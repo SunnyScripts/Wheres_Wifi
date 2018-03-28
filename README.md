@@ -75,6 +75,6 @@ Client
 
 There is an example web app seen on my website [ryan-berg.com](http://ryan-berg.com) which parses the Rest API.
 It also adds some functionality with getting directions, checking wifi availability and looking up by location.
-Conveniently, the _id of the business object matches yelp.com. Meaning, yelp.com/biz/id is the yelp page for that business.
+Conveniently, the id of the business object matches yelp.com. Meaning, yelp.com/biz/id is the yelp page for that business.
 
 There is also an iOS app now available that I worked on heavily. Check it out in the [App Store](https://itunes.apple.com/us/app/this-wifi-sucks/id925050107).
