@@ -7,8 +7,8 @@ Public Restful API
 
 Search for businesses with free wifi.
 
-Host: turingweb.com:10000
-Path: /search
+Host: ryan-berg.com
+Path: /wifi/search
 
 Query String:
 
@@ -16,7 +16,7 @@ Required Arguments: latitude=inDegrees&longitude=inDegrees
 
 Options Parameter: radius=inMiles [default 1 mile, max=10(any amount above returns results with 10)]
 
-Example Query: http://turingweb.com:10000/search?latitude=34.261555&longitude=-118.301857&radius=2
+Example Query: http://ryan-berg.com/wifi/search?latitude=34.261555&longitude=-118.301857&radius=2
 
 Optionally set your "Content-Encoding" header to "gzip" for compressed responses.
 (For most modern browsers, this is already set.)
@@ -31,7 +31,7 @@ Example JSON Response:
 
 {
 
-    _id: String(),
+    id: String(),
     name: String(),
     phoneNumber: String(),//'(012) 456-7890'
     category: Array(),
@@ -73,8 +73,8 @@ It then inserts the resulting json business in the businesses collection in the 
 Client
 =======================
 
-There is an example web app seen on my website [turingweb.com](http://turingweb.com/html/home_page.html) which parses the Rest API.
+There is an example web app seen on my website [ryan-berg.com](http://ryan-berg.com) which parses the Rest API.
 It also adds some functionality with getting directions, checking wifi availability and looking up by location.
-Conveniently, the _id of the business object matches yelp.com. Meaning, yelp.com/biz/_id is the yelp page for that business.
+Conveniently, the _id of the business object matches yelp.com. Meaning, yelp.com/biz/id is the yelp page for that business.
 
-There is also an iOS app now available that I worked on heavily. Check it out in the [App Store](https://itunes.apple.com/us/app/this-wifi-sucks/id925050107?mt=8).
+There is also an iOS app now available that I worked on heavily. Check it out in the [App Store](https://itunes.apple.com/us/app/this-wifi-sucks/id925050107).
