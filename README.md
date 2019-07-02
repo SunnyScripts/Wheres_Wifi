@@ -7,7 +7,7 @@ Public Restful API
 
 Search for businesses with free wifi.
 
-Host: ryan-berg.com
+Host: ryanberg.io
 Path: /wifi/search
 
 Query String:
@@ -16,7 +16,7 @@ Required Arguments: latitude=inDegrees&longitude=inDegrees
 
 Options Parameter: radius=inMiles [default 1 mile, max=10(any amount above returns results with 10)]
 
-Example Query: http://ryan-berg.com/wifi/search?latitude=34.261555&longitude=-118.301857&radius=2
+Example Query: http://ryanberg.io/wifi/search?latitude=34.261555&longitude=-118.301857&radius=2
 
 Optionally set your "Content-Encoding" header to "gzip" for compressed responses.
 (For most modern browsers, this is already set.)
@@ -73,7 +73,7 @@ It then inserts the resulting json business in the businesses collection in the 
 Client
 =======================
 
-There is an example web app seen on my website [ryan-berg.com](http://ryan-berg.com) which parses the Rest API.
+There is an example web app seen on my website [ryanberg.io](http://ryanberg.io) which parses the Rest API.
 It also adds some functionality with getting directions, checking wifi availability and looking up by location.
 Conveniently, the id of the business object matches yelp.com. Meaning, yelp.com/biz/id is the yelp page for that business.
 
