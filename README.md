@@ -73,7 +73,7 @@ It then inserts the resulting json business in the businesses collection in the 
 Client
 =======================
 
-There is an example web app seen on my website [ryanberg.io](http://ryanberg.io) which parses the Rest API.
+There is an example web app seen on my website [sunnyscripts.com](https://sunnyscripts.com) which parses the Rest API.
 It also adds some functionality with getting directions, checking wifi availability and looking up by location.
 Conveniently, the id of the business object matches yelp.com. Meaning, yelp.com/biz/id is the yelp page for that business.
 
